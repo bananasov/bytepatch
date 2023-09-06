@@ -1,0 +1,1 @@
+Wrapper crate for bytepatch_core, use this over bytepatch_core as this is more sane.

@@ -1,0 +1,3 @@
+The core functionality for bytepatch, this includes reading bytecode from a file and patching.
+Note that this is quite low level and should not be used unless you know what you are doing,
+use the main crate (bytepatch) instead for an easier experience. This code is cursed.

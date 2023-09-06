@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = [
+    "bytepatch_core",
+    "bytepatch",
+    "bytepatch_cli"
+]
