@@ -1,4 +1,4 @@
-use scroll::{Endian, ctx, Pread};
+use scroll::{ctx, Endian, Pread};
 
 #[derive(Debug)]
 pub struct Header {
