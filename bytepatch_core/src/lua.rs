@@ -1,5 +1,7 @@
 use scroll::{ctx, Endian, Pread};
 
+use crate::try_gread_vec_with;
+
 #[derive(Debug)]
 pub struct Header {
     pub magic: u32,           // four bytes
@@ -11,6 +13,24 @@ pub struct Header {
     pub instruction_size: u8, // one byte, default value is 4, Size of Instruction (in bytes)
     pub lua_number_size: u8,  // one byte, default value is 8, Size of lua_Number (in bytes)
     pub integral_flag: u8,    // one byte default value 0, 0=floating-point, 1=integral number type
+}
+
+#[derive(Debug)]
+pub struct LuaString {
+    pub data: Vec<u8>,
+}
+
+impl<'a> LuaString {
+    pub fn read(
+        src: &'a [u8],
+        offset: &mut usize,
+        endian: Endian,
+        integer: u8,
+    ) -> Result<(LuaString, usize), Box<dyn std::error::Error>> {
+        let data: Vec<u8> = try_gread_vec_with!(src, offset, integer, endian);
+
+        Ok((LuaString { data }, *offset))
+    }
 }
 
 impl<'a> ctx::TryFromCtx<'a, Endian> for Header {
