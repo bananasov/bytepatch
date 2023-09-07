@@ -2,7 +2,7 @@ use scroll::Pread;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
-use bytepatch_core::lua::{Header, LuaString};
+use bytepatch_core::lua::{Bytecode, Header, LuaString};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let f = File::open("bytecode.bin")?;
@@ -11,11 +11,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     reader.read_to_end(&mut buffer)?;
 
     let offset = &mut 0;
-    let header: Header = buffer.gread_with(offset, scroll::LE).unwrap();
-    println!("Header = {:#?}", header);
-
-    let (data, offset) = LuaString::read(&buffer, offset, scroll::LE, header.int_size)?;
-    println!("{:#?} {}", data, offset);
+    let bytecode = Bytecode::read(&buffer, offset, scroll::LE)?;
+    println!("Bytecode = {:#?}", bytecode);
 
     Ok(())
 }

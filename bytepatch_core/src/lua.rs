@@ -20,16 +20,112 @@ pub struct LuaString {
     pub data: Vec<u8>,
 }
 
-impl<'a> LuaString {
+#[derive(Debug)]
+pub struct Chunk {
+    pub source_name: LuaString,
+    // We hope this is right all the time, if not, fuck you!
+    pub line_defined: u32,
+    pub last_line_defined: u32,
+    pub num_upvalues: u8,
+    pub num_params: u8,
+    pub is_vararg: u8,
+    pub max_stack_size: u8,
+}
+
+#[derive(Debug)]
+pub struct Bytecode {
+    pub header: Header,
+    pub chunk: Chunk,
+}
+
+impl<'a> Bytecode {
     pub fn read(
         src: &'a [u8],
         offset: &mut usize,
         endian: Endian,
-        integer: u8,
-    ) -> Result<(LuaString, usize), Box<dyn std::error::Error>> {
-        let data: Vec<u8> = try_gread_vec_with!(src, offset, integer, endian);
+    ) -> Result<Bytecode, Box<dyn std::error::Error>> {
+        let header: Header = src.gread_with(offset, scroll::LE)?;
+        let chunk = match header.size_t_size {
+            4 => Chunk::read_u32(src, offset, endian)?,
+            8 => Chunk::read_u64(src, offset, endian)?,
+            _ => unreachable!("Invalid size_t size, expected 4 or 8 depending on arch"),
+        };
 
-        Ok((LuaString { data }, *offset))
+        Ok(Bytecode { header, chunk })
+    }
+}
+
+impl<'a> Chunk {
+    pub fn read_u32(
+        src: &'a [u8],
+        offset: &mut usize,
+        endian: Endian,
+    ) -> Result<Chunk, Box<dyn std::error::Error>> {
+        let source_name = LuaString::read_u32(src, offset, endian)?;
+        let line_defined: u32 = src.gread_with(offset, endian)?;
+        let last_line_defined: u32 = src.gread_with(offset, endian)?;
+        let num_upvalues: u8 = src.gread_with(offset, endian)?;
+        let num_params: u8 = src.gread_with(offset, endian)?;
+        let is_vararg: u8 = src.gread_with(offset, endian)?;
+        let max_stack_size: u8 = src.gread_with(offset, endian)?;
+
+        Ok(Chunk {
+            source_name,
+            line_defined,
+            last_line_defined,
+            num_upvalues,
+            num_params,
+            is_vararg,
+            max_stack_size,
+        })
+    }
+
+    pub fn read_u64(
+        src: &'a [u8],
+        offset: &mut usize,
+        endian: Endian,
+    ) -> Result<Chunk, Box<dyn std::error::Error>> {
+        let source_name = LuaString::read_u64(src, offset, endian)?;
+        let line_defined: u32 = src.gread_with(offset, endian)?;
+        let last_line_defined: u32 = src.gread_with(offset, endian)?;
+        let num_upvalues: u8 = src.gread_with(offset, endian)?;
+        let num_params: u8 = src.gread_with(offset, endian)?;
+        let is_vararg: u8 = src.gread_with(offset, endian)?;
+        let max_stack_size: u8 = src.gread_with(offset, endian)?;
+
+        Ok(Chunk {
+            source_name,
+            line_defined,
+            last_line_defined,
+            num_upvalues,
+            num_params,
+            is_vararg,
+            max_stack_size,
+        })
+    }
+}
+
+impl<'a> LuaString {
+    pub fn read_u32(
+        src: &'a [u8],
+        offset: &mut usize,
+        endian: Endian,
+    ) -> Result<LuaString, Box<dyn std::error::Error>> {
+        let size: u32 = src.gread_with(offset, endian)?;
+        let data: Vec<u8> = try_gread_vec_with!(src, offset, size, endian);
+
+        Ok(LuaString { data })
+    }
+
+    pub fn read_u64(
+        src: &'a [u8],
+        offset: &mut usize,
+        endian: Endian,
+    ) -> Result<LuaString, Box<dyn std::error::Error>> {
+        let size: u64 = src.gread_with(offset, endian)?;
+        let data: Vec<u8> = try_gread_vec_with!(src, offset, size, endian);
+
+        Ok(LuaString { data })
     }
 }
 
