@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use scroll::{ctx, Endian, Pread};
 
 use crate::try_gread_vec_with;
@@ -18,6 +20,14 @@ pub struct Header {
 #[derive(Debug)]
 pub struct LuaString {
     pub data: Vec<u8>,
+}
+
+
+impl Display for LuaString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = String::from_utf8(self.data.clone()).unwrap();
+        f.write_str(&str)
+    }
 }
 
 #[derive(Debug)]
