@@ -1,8 +1,7 @@
-use scroll::Pread;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
-use bytepatch_core::lua::{Bytecode, Header, LuaString};
+use bytepatch_core::lua::Bytecode;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let f = File::open("bytecode.bin")?;
@@ -13,7 +12,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let offset = &mut 0;
     let bytecode = Bytecode::read(&buffer, offset, scroll::LE)?;
     println!("Bytecode = {:#?}", bytecode);
-    println!("owo: {}", bytecode.chunk.source_name);
 
     Ok(())
 }

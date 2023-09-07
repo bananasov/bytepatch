@@ -2,6 +2,8 @@ use std::fmt::Display;
 
 use scroll::{ctx, Endian, Pread};
 
+pub mod instructions;
+
 use crate::try_gread_vec_with;
 
 #[derive(Debug)]
@@ -31,6 +33,13 @@ impl Display for LuaString {
 }
 
 #[derive(Debug)]
+pub struct Instructions {
+    pub amount: u32,
+    // TODO: Replace u32 with an actual instruction struct.
+    pub instruction_list: Vec<u32>
+}
+
+#[derive(Debug)]
 pub struct Chunk {
     pub source_name: LuaString,
     // We hope this is right all the time, if not, fuck you!
@@ -40,6 +49,20 @@ pub struct Chunk {
     pub num_params: u8,
     pub is_vararg: u8,
     pub max_stack_size: u8,
+    pub instructions: Vec<u32>
+}
+
+impl<'a> Instructions {
+    pub fn read(
+        src: &'a [u8],
+        offset: &mut usize,
+        endian: Endian,
+    ) -> Result<Instructions, Box<dyn std::error::Error>> {
+        let amount: u32 = src.gread_with(offset, endian)?;
+        let instruction_list: Vec<u32> = try_gread_vec_with!(src, offset, amount, endian);
+
+        Ok(Instructions { amount, instruction_list })
+    }
 }
 
 #[derive(Debug)]
@@ -79,6 +102,8 @@ impl<'a> Chunk {
         let is_vararg: u8 = src.gread_with(offset, endian)?;
         let max_stack_size: u8 = src.gread_with(offset, endian)?;
 
+        let instructions = Instructions::read(src, offset, endian)?;
+
         Ok(Chunk {
             source_name,
             line_defined,
@@ -87,6 +112,7 @@ impl<'a> Chunk {
             num_params,
             is_vararg,
             max_stack_size,
+            instructions: instructions.instruction_list,
         })
     }
 
@@ -103,6 +129,8 @@ impl<'a> Chunk {
         let is_vararg: u8 = src.gread_with(offset, endian)?;
         let max_stack_size: u8 = src.gread_with(offset, endian)?;
 
+        let instructions = Instructions::read(src, offset, endian)?;
+
         Ok(Chunk {
             source_name,
             line_defined,
@@ -111,6 +139,7 @@ impl<'a> Chunk {
             num_params,
             is_vararg,
             max_stack_size,
+            instructions: instructions.instruction_list,
         })
     }
 }
