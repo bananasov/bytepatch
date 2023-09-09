@@ -3,10 +3,11 @@ use std::fmt::Display;
 use scroll::{ctx, Endian, Pread};
 
 pub mod instructions;
+pub mod constants;
 
 use crate::try_gread_vec_with;
 
-use self::instructions::{Instruction, Opcode};
+use instructions::{Instruction, Opcode};
 
 #[derive(Debug)]
 pub struct Header {
@@ -89,6 +90,7 @@ impl<'a> Instructions {
         Ok(Instructions { amount, instruction_list: instructions })
     }
 }
+
 
 impl<'a> Chunk {
     pub fn read_u32(
