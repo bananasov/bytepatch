@@ -1,6 +1,6 @@
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
-pub enum InstructionType {
+pub enum Instruction {
     iABC(Opcode, u8, u16, u16),
     iABx(Opcode, u8, u32),
     iAsBx(Opcode, u8, i32),
@@ -152,19 +152,19 @@ impl From<u8> for Opcode {
             35 => Opcode::OP_CLOSE,
             36 => Opcode::OP_CLOSURE,
             37 => Opcode::OP_VARARG,
-            _ => unreachable!("WHAT THE FUCK WE GOT AN INVALID OPCODE"),
+            _ => unreachable!("WHAT THE FUCK WE GOT AN INVALID Instruction"),
         }
     }
 }
 
 impl Opcode {
-    pub fn decode(op: u32) -> InstructionType {
+    pub fn decode(op: u32) -> Instruction {
         use Opcode::*;
 
+        let instruction: Opcode = ((op & 0x3F) as u8).into();
         let a = ((op >> 6) & 0xFF) as u8;
-        let opc: Opcode = a.into();
 
-        match opc {
+        match instruction {
             OP_MOVE | OP_LOADBOOL | OP_LOADNIL | OP_GETUPVAL | OP_GETTABLE | OP_SETUPVAL
             | OP_SETTABLE | OP_NEWTABLE | OP_SELF | OP_ADD | OP_SUB | OP_MUL | OP_DIV | OP_MOD
             | OP_POW | OP_UNM | OP_NOT | OP_LEN | OP_CONCAT | OP_EQ | OP_LT | OP_LE | OP_TEST
@@ -172,20 +172,20 @@ impl Opcode {
             | OP_CLOSE | OP_VARARG => {
                 let b = ((op >> 23) & 0x1FF) as u16;
                 let c = ((op >> 14) & 0x1FF) as u16;
-                return InstructionType::iABC(opc, a, b, c)
+                return Instruction::iABC(instruction, a, b, c);
             }
             OP_LOADK | OP_GETGLOBAL | OP_SETGLOBAL | OP_CLOSURE => {
-                let bx  = (op >> 14) & 0x3FFFF;
-                return InstructionType::iABx(opc, a, bx)
+                let bx = (op >> 14) & 0x3FFFF;
+                return Instruction::iABx(instruction, a, bx);
             }
             OP_JMP | OP_FORLOOP | OP_FORPREP => {
                 let sbx = (((op >> 14) & 0x3FFFF) as i32) - 137071;
-                return InstructionType::iAsBx(opc, a, sbx)
+                return Instruction::iAsBx(instruction, a, sbx);
             }
         }
     }
 
-    pub fn encode(op: u32) {
+    pub fn encode(_op: u32) {
         todo!()
     }
 }
