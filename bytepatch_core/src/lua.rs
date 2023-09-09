@@ -52,19 +52,6 @@ pub struct Chunk {
     pub instructions: Vec<u32>
 }
 
-impl<'a> Instructions {
-    pub fn read(
-        src: &'a [u8],
-        offset: &mut usize,
-        endian: Endian,
-    ) -> Result<Instructions, Box<dyn std::error::Error>> {
-        let amount: u32 = src.gread_with(offset, endian)?;
-        let instruction_list: Vec<u32> = try_gread_vec_with!(src, offset, amount, endian);
-
-        Ok(Instructions { amount, instruction_list })
-    }
-}
-
 #[derive(Debug)]
 pub struct Bytecode {
     pub header: Header,
@@ -85,6 +72,19 @@ impl<'a> Bytecode {
         };
 
         Ok(Bytecode { header, chunk })
+    }
+}
+
+impl<'a> Instructions {
+    pub fn read(
+        src: &'a [u8],
+        offset: &mut usize,
+        endian: Endian,
+    ) -> Result<Instructions, Box<dyn std::error::Error>> {
+        let amount: u32 = src.gread_with(offset, endian)?;
+        let instruction_list: Vec<u32> = try_gread_vec_with!(src, offset, amount, endian);
+
+        Ok(Instructions { amount, instruction_list })
     }
 }
 
