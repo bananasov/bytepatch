@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
 pub enum Instruction {
@@ -64,6 +66,61 @@ pub enum Opcode {
     OP_CLOSURE = 36, /*	A Bx	R(A) := closure(KPROTO[Bx], R(A), ... ,R(A+n))	*/
 
     OP_VARARG = 37, /*	A B	R(A), R(A+1), ..., R(A+B-1) = vararg		*/
+}
+
+impl Display for Instruction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Instruction::iABC(op, a, b, c) => write!(f, "{} {} {} {}", op, a, b, c),
+            Instruction::iABx(op, a, bx) => write!(f, "{} {} {}", op, a, bx),
+            Instruction::iAsBx(op, a, sbx) => write!(f, "{} {} {}", op, a, sbx),
+        }
+    }
+}
+
+impl Display for Opcode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Opcode::OP_MOVE => f.write_str("MOVE"),
+            Opcode::OP_LOADK => f.write_str("LOADK"),
+            Opcode::OP_LOADBOOL => f.write_str("LOADBOOL"),
+            Opcode::OP_LOADNIL => f.write_str("LOADNIL"),
+            Opcode::OP_GETUPVAL => f.write_str("GETUPVAL"),
+            Opcode::OP_GETGLOBAL => f.write_str("GETGLOBAL"),
+            Opcode::OP_GETTABLE => f.write_str("GETTABLE"),
+            Opcode::OP_SETGLOBAL => f.write_str("SETGLOBAL"),
+            Opcode::OP_SETUPVAL => f.write_str("SETUPVAL"),
+            Opcode::OP_SETTABLE => f.write_str("SETTABLE"),
+            Opcode::OP_NEWTABLE => f.write_str("NEWTABLE"),
+            Opcode::OP_SELF => f.write_str("SELF"),
+            Opcode::OP_ADD => f.write_str("ADD"),
+            Opcode::OP_SUB => f.write_str("SUB"),
+            Opcode::OP_MUL => f.write_str("MUL"),
+            Opcode::OP_DIV => f.write_str("DIV"),
+            Opcode::OP_MOD => f.write_str("MOD"),
+            Opcode::OP_POW => f.write_str("POW"),
+            Opcode::OP_UNM => f.write_str("UNM"),
+            Opcode::OP_NOT => f.write_str("NOT"),
+            Opcode::OP_LEN => f.write_str("LEN"),
+            Opcode::OP_CONCAT => f.write_str("CONCAT"),
+            Opcode::OP_JMP => f.write_str("JMP"),
+            Opcode::OP_EQ => f.write_str("EQ"),
+            Opcode::OP_LT => f.write_str("LT"),
+            Opcode::OP_LE => f.write_str("LE"),
+            Opcode::OP_TEST => f.write_str("TEST"),
+            Opcode::OP_TESTSET => f.write_str("TESTSET"),
+            Opcode::OP_CALL => f.write_str("CALL"),
+            Opcode::OP_TAILCALL => f.write_str("TAILCALL"),
+            Opcode::OP_RETURN => f.write_str("RETURN"),
+            Opcode::OP_FORLOOP => f.write_str("FORLOOP"),
+            Opcode::OP_FORPREP => f.write_str("FORPREP"),
+            Opcode::OP_TFORLOOP => f.write_str("TFORLOOP"),
+            Opcode::OP_SETLIST => f.write_str("SETLIST"),
+            Opcode::OP_CLOSE => f.write_str("CLOSE"),
+            Opcode::OP_CLOSURE => f.write_str("CLOSURE"),
+            Opcode::OP_VARARG => f.write_str("VARARG"),
+        }
+    }
 }
 
 impl Into<u8> for Opcode {

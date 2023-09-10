@@ -11,7 +11,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let offset = &mut 0;
     let bytecode = Bytecode::read(&buffer, offset, scroll::LE)?;
-    println!("Bytecode = {:#?}", bytecode);
+    // bytecode.chunk.source_name
+    println!("============== Lua Bytecode Disassembly ==============");
+    println!("Chunk name: {}", bytecode.chunk.source_name);
+    for instruction in bytecode.chunk.instructions {
+        println!("{}", instruction);
+    }
 
     Ok(())
 }
