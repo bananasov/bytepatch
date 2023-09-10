@@ -28,13 +28,6 @@ pub struct LuaString {
 }
 
 
-impl Display for LuaString {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = String::from_utf8(self.data.clone()).unwrap();
-        f.write_str(&str)
-    }
-}
-
 #[derive(Debug)]
 pub struct Instructions {
     pub amount: u32,
@@ -58,6 +51,20 @@ pub struct Chunk {
 pub struct Bytecode {
     pub header: Header,
     pub chunk: Chunk,
+}
+
+impl Into<String> for LuaString {
+    fn into(self) -> String {
+        let str = String::from_utf8(self.data).unwrap();
+        str
+    }
+}
+
+impl Display for LuaString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = String::from_utf8(self.data.clone()).unwrap();
+        f.write_str(&str)
+    }
 }
 
 impl<'a> Bytecode {
