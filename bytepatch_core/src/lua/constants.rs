@@ -15,7 +15,6 @@ impl<'a> Constant {
     pub fn decode(
         src: &'a [u8],
         offset: &mut usize,
-        size_t_size: u8,
         endian: Endian,
     ) -> Result<Constant, Box<dyn std::error::Error>> {
         let const_type: u8 = src.gread_with(offset, endian)?;
@@ -30,11 +29,11 @@ impl<'a> Constant {
                 Constant::LUA_TNUMBER(value)
             },
             4 => {
-                let str = match size_t_size {
-                    4 => LuaString::read_u32(src, offset, endian)?,
-                    8 => LuaString::read_u64(src, offset, endian)?,
-                    _ => unreachable!(),
-                };
+                #[cfg(target_arch="x86")]
+                let str = LuaString::read_u32(src, offset, endian)?;
+                
+                #[cfg(target_arch="x86_64")]
+                let str = LuaString::read_u64(src, offset, endian)?;
 
                 Constant::LUA_TSTRING(str)
             },

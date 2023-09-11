@@ -125,6 +125,7 @@ pub struct Chunk {
     pub is_vararg: u8,
     pub max_stack_size: u8,
     pub instructions: Vec<Instruction>,
+    // pub constants: Vec<Constant>
 }
 
 impl<'a> Chunk {
