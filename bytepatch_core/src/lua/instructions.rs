@@ -123,9 +123,9 @@ impl Display for Opcode {
     }
 }
 
-impl Into<u8> for Opcode {
-    fn into(self) -> u8 {
-        match self {
+impl From<Opcode> for u8 {
+    fn from(val: Opcode) -> u8 {
+        match val {
             Opcode::OP_MOVE => 0,
             Opcode::OP_LOADK => 1,
             Opcode::OP_LOADBOOL => 2,
@@ -229,15 +229,15 @@ impl Opcode {
             | OP_CLOSE | OP_VARARG => {
                 let b = ((op >> 23) & 0x1FF) as u16;
                 let c = ((op >> 14) & 0x1FF) as u16;
-                return Instruction::iABC(instruction, a, b, c);
+                Instruction::iABC(instruction, a, b, c)
             }
             OP_LOADK | OP_GETGLOBAL | OP_SETGLOBAL | OP_CLOSURE => {
                 let bx = (op >> 14) & 0x3FFFF;
-                return Instruction::iABx(instruction, a, bx);
+                Instruction::iABx(instruction, a, bx)
             }
             OP_JMP | OP_FORLOOP | OP_FORPREP => {
                 let sbx = (((op >> 14) & 0x3FFFF) as i32) - 137071;
-                return Instruction::iAsBx(instruction, a, sbx);
+                Instruction::iAsBx(instruction, a, sbx)
             }
         }
     }

@@ -57,10 +57,9 @@ impl<'a> ctx::TryFromCtx<'a, Endian> for Header {
 #[derive(Debug)]
 pub struct LuaString(Vec<u8>);
 
-impl Into<String> for LuaString {
-    fn into(self) -> String {
-        let str = String::from_utf8(self.0).unwrap();
-        str
+impl From<LuaString> for String {
+    fn from(value: LuaString) -> Self {
+        String::from_utf8(value.0).unwrap()
     }
 }
 
