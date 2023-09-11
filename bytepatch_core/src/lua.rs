@@ -2,8 +2,8 @@ use std::fmt::Display;
 
 use scroll::{ctx, Endian, Pread};
 
-pub mod instructions;
 pub mod constants;
+pub mod instructions;
 
 use crate::try_gread_vec_with;
 
@@ -106,9 +106,12 @@ impl<'a> Instructions {
     ) -> Result<Instructions, Box<dyn std::error::Error>> {
         let amount: u32 = src.gread_with(offset, endian)?;
         let instruction_list: Vec<u32> = try_gread_vec_with!(src, offset, amount, endian);
-        let instructions: Vec<Instruction> = instruction_list.iter().map(|f| Opcode::decode(*f)).collect();
+        let instructions: Vec<Instruction> = instruction_list
+            .iter()
+            .map(|f| Opcode::decode(*f))
+            .collect();
 
-        Ok(Instructions (instructions))
+        Ok(Instructions(instructions))
     }
 }
 
@@ -122,7 +125,7 @@ pub struct Chunk {
     pub num_params: u8,
     pub is_vararg: u8,
     pub max_stack_size: u8,
-    pub instructions: Vec<Instruction>
+    pub instructions: Vec<Instruction>,
 }
 
 impl<'a> Chunk {
@@ -203,4 +206,3 @@ impl<'a> Bytecode {
         Ok(Bytecode { header, chunk })
     }
 }
-
