@@ -1,12 +1,11 @@
+use super::LuaString;
+
 
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
-pub enum ConstantType {
+pub enum Constant {
     LUA_TNIL,
     LUA_TBOOLEAN(bool),
     LUA_TNUMBER(u32),
-    LUA_TSTRING(String),
+    LUA_TSTRING(LuaString),
 }
-
-#[derive(Debug)]
-pub struct Constant(ConstantType);
